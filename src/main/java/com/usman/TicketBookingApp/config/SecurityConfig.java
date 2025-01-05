@@ -58,7 +58,7 @@ public class SecurityConfig {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         var jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");  // ✅ Ensure it matches the claim in your JWT
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");       // ✅ Prefix with ROLE_
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");       // ✅ Remove the automatic "ROLE_" prefix
 
         var converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);

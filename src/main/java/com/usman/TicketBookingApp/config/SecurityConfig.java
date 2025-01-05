@@ -4,21 +4,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.filter.CorsFilter;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 public class SecurityConfig {
 
@@ -44,7 +49,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/bookings/**").hasAuthority("ROLE_USER")
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder()))); // ✅ Corrected way to configure JwtDecoder
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtDecoder -> jwtDecoder.jwtAuthenticationConverter(jwt -> {
+                    var authorities = jwt.getClaimAsStringList("authorities");
+                    return new JwtAuthenticationToken(jwt, authorities.stream()
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList()));
+                }))); // ✅ Corrected way to configure JwtDecoder
 
         return http.build();
     }

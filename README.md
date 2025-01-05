@@ -71,7 +71,7 @@ With the **Amadeus API**, we aim to provide a **real-time booking experience**, 
 
 ## 📂 **Repository Structure**
 
-TicketBookingApp ├── Backend (Spring Boot Application) └── Frontend (React + Vite)
+TicketBookingApp |- Backend (Spring Boot Application) |- Frontend (React + Vite)
 ---
 
 ## 📬 **Want to Contribute?**

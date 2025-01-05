@@ -17,42 +17,53 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    // ✅ Security Filter Chain for configuring authentication and authorization
+    // Security Filter Chain for HTTP security configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity (adjust as needed)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Handle CORS
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Public endpoints for login and registration
-                        .requestMatchers("/api/bookings/**").authenticated() // Secure bookings endpoint
+                        .requestMatchers("/api/auth/**").permitAll() // Public endpoints
                         .anyRequest().authenticated() // Secure all other endpoints
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt()); // Enable JWT-based security
+                );
 
         return http.build();
     }
 
-    // ✅ CORS Configuration for handling cross-origin requests
-    private UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    // CORS Filter to handle Cross-Origin Resource Sharing
+    @Bean
+    public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*")); // Allow all origins (adjust as needed)
+        config.setAllowedOrigins(List.of("*")); // You can restrict this to your frontend URL
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        return source;
+
+        return new CorsFilter(source);
     }
 
-    // ✅ Authentication Manager Bean
+    // CORS Configuration source for allowing specific origins, methods, and headers
+    private UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*"); // Allow all origins (adjust as needed)
+        configuration.addAllowedMethod("*"); // Allow all HTTP methods
+        configuration.addAllowedHeader("*"); // Allow all headers
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+    // ✅ Add this AuthenticationManager bean
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // ✅ Password Encoder Bean for encrypting and validating passwords
+    // PasswordEncoder bean for encrypting and validating passwords
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

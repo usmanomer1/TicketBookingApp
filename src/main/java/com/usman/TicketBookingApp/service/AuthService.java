@@ -39,20 +39,21 @@ public class AuthService {
         userRepo.save(user);
         return "User registered successfully!";
     }
-    public String Login(String username, String password) throws AuthenticationException {
+    public String login(String username, String password) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
 
         if (authentication.isAuthenticated()) {
-            // Pass both username and roles to the generateToken() method
             List<String> roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
+
             return jwtUtils.generateToken(username, roles);
         } else {
             throw new RuntimeException("Invalid credentials");
         }
     }
+
 
 }

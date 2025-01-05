@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
@@ -47,9 +48,10 @@ public class JwtUtils {
                 .claim("roles", roles)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))  // 10 hours expiration
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes(StandardCharsets.UTF_8))  // Signing algorithm
                 .compact();
     }
+
 
     public Boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);

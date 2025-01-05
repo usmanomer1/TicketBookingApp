@@ -1,6 +1,5 @@
 package com.usman.TicketBookingApp.restcontroller;
 
-import com.usman.TicketBookingApp.exception.TouristNotFoundException;
 import com.usman.TicketBookingApp.model.Tourist;
 import com.usman.TicketBookingApp.service.ITouristManagement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,100 +10,46 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
-public class TouristController 
-{
- 
+@RequestMapping("/api/bookings")
+@CrossOrigin(origins = "http://localhost:5173")
+public class TouristController {
+
 	@Autowired
-	private ITouristManagement service;
-	
-	@PostMapping("/register")
-	public ResponseEntity<String> enrollTourist(@RequestBody Tourist tourist)
-	{
-		try
-		{
-			String msg=service.registerTourist(tourist);
-			return new ResponseEntity<String>(msg, HttpStatus.OK);
-		}
-		catch(Exception e)
-		{
-			return new ResponseEntity<String>("Some problem in enrolling tourist", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+	private ITouristManagement bookingService;
+
+	// Create a new booking
+	@PostMapping
+	public ResponseEntity<String> createBooking(@RequestBody Tourist tourist) {
+		String msg = bookingService.registerTourist(tourist);
+		return new ResponseEntity<>(msg, HttpStatus.CREATED);
 	}
-	
-	
-	@GetMapping("/findAll")
-	public ResponseEntity<?> fetchAllTourists()
-	{
-		try
-		{
-			List<Tourist> list = service.fetchAllTourists();
-			return new ResponseEntity<>(list, HttpStatus.OK);
-		}
-		catch(Exception e)
-		{
-			return new ResponseEntity<>("Some problem in fetching tourist info", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+
+	// Get all bookings
+	@GetMapping
+	public ResponseEntity<List<Tourist>> getAllBookings() {
+		List<Tourist> bookings = bookingService.fetchAllTourists();
+		return new ResponseEntity<>(bookings, HttpStatus.OK);
 	}
-	
-	@GetMapping("/findById/{id}")
-	public ResponseEntity<?> fetchTourist(@PathVariable("id") Integer id)
-	{
-		try
-		{
-			Tourist tourist = service.fetchTouristInfoById(id);
-			return new ResponseEntity<>(tourist, HttpStatus.OK);
-		}
-		catch(TouristNotFoundException e)
-		{
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+
+	// Get a specific booking by ID
+	@GetMapping("/{id}")
+	public ResponseEntity<Tourist> getBookingById(@PathVariable Integer id) {
+		Tourist booking = bookingService.fetchTouristInfoById(id);
+		return new ResponseEntity<>(booking, HttpStatus.OK);
 	}
-	
-	@PutMapping("/update")
-	public ResponseEntity<String> updateTouristInfo(@RequestBody Tourist tourist)
-	{
-		try
-		{
-			String msg=service.updateTouristInfo(tourist);
-			return new ResponseEntity<String>(msg, HttpStatus.OK);
-		}
-		catch(TouristNotFoundException e)
-		{
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+
+	// Update a booking by ID
+	@PutMapping("/{id}")
+	public ResponseEntity<String> updateBooking(@PathVariable Integer id, @RequestBody Tourist tourist) {
+		tourist.setTid(id);
+		String msg = bookingService.updateTouristInfo(tourist);
+		return new ResponseEntity<>(msg, HttpStatus.OK);
 	}
-	
-	@PatchMapping("/updatebudget/{id}/{budget}")
-	public ResponseEntity<String> updateTouristInfo(@PathVariable("id")Integer id, 
-			@PathVariable("budget")Double budget)
-	{
-		try
-		{
-			String msg=service.updateTouristInfoById(id, budget);
-			
-			return new ResponseEntity<String>(msg, HttpStatus.OK);
-		}
-		catch(TouristNotFoundException e)
-		{
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+
+	// Delete a booking by ID
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deleteBooking(@PathVariable Integer id) {
+		String msg = bookingService.deleteTouristById(id);
+		return new ResponseEntity<>(msg, HttpStatus.OK);
 	}
-	
-	@DeleteMapping("/delete/{id}")
-	public ResponseEntity<String> deleteTouristInfo(@PathVariable("id")Integer id)
-	{
-		try
-		{
-			String msg=service.deleteTouristById(id);
-			
-			return new ResponseEntity<String>(msg, HttpStatus.OK);
-		}
-		catch(TouristNotFoundException e)
-		{
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-	}
-	
-	
 }

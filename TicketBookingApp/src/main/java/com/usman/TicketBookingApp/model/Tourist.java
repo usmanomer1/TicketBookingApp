@@ -6,25 +6,23 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Tourist 
-{
-	 @Id
-	 @GeneratedValue(strategy=GenerationType.AUTO)
-     private Integer tid;
-     
-     private String name;
-     
-     private String city;
-     
-     private String packageType;
-     
-     private Double budget;
+public class Tourist {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer tid; // Booking ID
+
+	private String customerName; // Customer's Name
+	private String destination; // Destination (City or Place)
+	private String packageType; // Package Type (e.g., Economy, Premium)
+	private Double price; // Booking price
+	private String status; // Booking status (e.g., "Confirmed", "Pending", "Canceled")
 
 	public Tourist() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
+	// Getters and Setters
 	public Integer getTid() {
 		return tid;
 	}
@@ -33,20 +31,20 @@ public class Tourist
 		this.tid = tid;
 	}
 
-	public String getName() {
-		return name;
+	public String getCustomerName() {
+		return customerName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
 	}
 
-	public String getCity() {
-		return city;
+	public String getDestination() {
+		return destination;
 	}
 
-	public void setCity(String city) {
-		this.city = city;
+	public void setDestination(String destination) {
+		this.destination = destination;
 	}
 
 	public String getPackageType() {
@@ -57,14 +55,19 @@ public class Tourist
 		this.packageType = packageType;
 	}
 
-	public Double getBudget() {
-		return budget;
+	public Double getPrice() {
+		return price;
 	}
 
-	public void setBudget(Double budget) {
-		this.budget = budget;
+	public void setPrice(Double price) {
+		this.price = price;
 	}
-     
-     
-     
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 }

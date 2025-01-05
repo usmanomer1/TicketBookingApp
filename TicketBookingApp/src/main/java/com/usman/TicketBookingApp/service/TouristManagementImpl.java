@@ -68,7 +68,7 @@ public class TouristManagementImpl implements ITouristManagement
 		if(optional.isPresent())
 		{
 			Tourist tourist = optional.get();
-			tourist.setBudget(budget);
+			tourist.setPrice(budget);
 			repo.save(tourist);
 			return "Tourist info with id "+ id + " is updated" ;
 			

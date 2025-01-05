@@ -7,18 +7,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "user")  // Change this if you've renamed the table
+@Table(name = "user")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generate the ID
     private Long id;
 
     private String username;
 
     private String password;
 
-    private String roles;  // New column added to store roles (e.g., "ROLE_USER")
+    private String roles = "ROLE_USER"; // Set default role
+
+    // Getters and setters
+
+// New column added to store roles (e.g., "ROLE_USER")
 
     // Constructors
     public User() {

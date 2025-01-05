@@ -24,19 +24,21 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Public endpoints
-                        .anyRequest().authenticated() // Secure all other endpoints
-                );
+                        .requestMatchers("/api/auth/**").permitAll()  // Public endpoints
+                        .requestMatchers("/api/bookings/**").hasAnyRole("USER", "ADMIN")  // Authenticated users
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt());
 
         return http.build();
     }
 
-    // CORS Filter to handle Cross-Origin Resource Sharing
+    // ✅ Update CORS Filter to Allow Your Frontend URL
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*")); // You can restrict this to your frontend URL
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(List.of("https://ticketbookignapp-frontend.vercel.app"));  // Frontend origin
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));  // HTTP methods
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setExposedHeaders(List.of("Authorization"));
 
@@ -46,18 +48,21 @@ public class SecurityConfig {
         return new CorsFilter(source);
     }
 
-    // CORS Configuration source for allowing specific origins, methods, and headers
+    // ✅ CORS Configuration source for allowing the frontend
     private UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); // Allow all origins (adjust as needed)
-        configuration.addAllowedMethod("*"); // Allow all HTTP methods
-        configuration.addAllowedHeader("*"); // Allow all headers
+        configuration.setAllowedOrigins(List.of("https://ticketbookignapp-frontend.vercel.app"));  // Allow only your frontend
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));  // Allow HTTP methods
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));  // Allow headers
+        configuration.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
-    // ✅ Add this AuthenticationManager bean
+
+    // AuthenticationManager bean for password authentication
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

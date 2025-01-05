@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 
 @Component
@@ -40,10 +41,10 @@ public class JwtUtils {
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
-
-    public String generateToken(String username) {
+    public String generateToken(String username, List<String> roles) {
         return Jwts.builder()
                 .setSubject(username)
+                .claim("roles", roles)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))  // 10 hours expiration
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
@@ -54,5 +55,17 @@ public class JwtUtils {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
+
+    public void printTokenClaims(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey("IYLSxLSchUaq8JLUni6MjkZiPZBA9AQPqEeQMrLZs5g=")
+                .parseClaimsJws(token)
+                .getBody();
+
+        System.out.println("Username: " + claims.getSubject());
+        System.out.println("Expiration: " + claims.getExpiration());
+        System.out.println("Roles: " + claims.get("roles"));
+    }
+
 }
 

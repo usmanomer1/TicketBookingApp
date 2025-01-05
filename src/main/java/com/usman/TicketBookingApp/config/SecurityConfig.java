@@ -26,10 +26,12 @@ public class SecurityConfig {
 
     // ✅ Define JwtDecoder bean with SecretKeySpec
     @Bean
+
     public JwtDecoder jwtDecoder() {
-        SecretKey secretKey = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-        return NimbusJwtDecoder.withSecretKey(secretKey).build();
+        byte[] secretKeyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+        return NimbusJwtDecoder.withSecretKey(new SecretKeySpec(secretKeyBytes, "HmacSHA256")).build();
     }
+
 
     // ✅ Updated SecurityFilterChain method without deprecated .jwt()
     @Bean
